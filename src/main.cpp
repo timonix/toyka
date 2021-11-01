@@ -17,6 +17,7 @@ Av: Timjan & Noc
 
 #include "test.h"
 #include "webCode.h"
+#include "MotorController.h"
 
 
 // --- Wifi and webserver stuff ---
@@ -37,6 +38,8 @@ IPAddress apIP(192, 168, 1, 1);
 Adafruit_MPU6050 mpu;
 ESP8266WebServer server(80);
 
+MotorController steeringMotor(300, 14, 15);
+
 void webTest() {
   server.send(200, "text/html", "<h1>Du är online, kompis</h1>");
 }
@@ -48,6 +51,7 @@ void setup() {
   delay(1000);
   Serial.println("Start of program!");
 
+  steeringMotor.init();
 
   // --- Initializing the MPU ---
   
@@ -111,6 +115,22 @@ void loop() {
   Serial.println(" rad/s");
 */
   delay(50);
+  
+
+  // --- Testing code for motors -----------
+
+  if (Serial.available()) {
+    char serialSignal = Serial.read();
+    Serial.println(serialSignal);
+
+    if (serialSignal == 'l')
+      steeringMotor.steer(MotorController::direction::left);
+    else if (serialSignal == 'r')
+      steeringMotor.steer(MotorController::direction::right);
+    else if (serialSignal == 'f')
+      steeringMotor.steer(MotorController::direction::forward);
+  }
+
   
 
 }
