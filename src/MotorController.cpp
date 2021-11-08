@@ -9,19 +9,63 @@ MotorController::MotorController(int maxMotorSpeed, int motorPinA, int motorPinB
     this->maxMotorSpeed = maxMotorSpeed;
     this->motorPinA = motorPinA;
     this->motorPinB = motorPinB;
+    this->motorSpeedDeltaTime = 0;
+    this->motorSpeedLastTime = 0;
 
     this->lastDirection = MotorController::direction::forward;
 
 }
 
+
+
 void MotorController::init() {
     pinMode(this->motorPinA, OUTPUT);
     pinMode(this->motorPinB, OUTPUT);
 
-    this->steer(MotorController::direction::left);         // Turn left and then forward to reset the front wheels
+    digitalWrite(this->motorPinA, LOW);
+    digitalWrite(this->motorPinB, LOW);
+
+    /*
+    this->steer(MotorController::direction::left);         // Turn left and then forward to reset the front wheels. OBS not used, since this class is for both steering and driving of the car
     delay(1000);
     this->steer(MotorController::direction::forward);
+    */
 }
+
+
+
+static inline int asm_ccount(void) {
+
+    int r;
+
+    asm volatile ("rsr %0, ccount" : "=r"(r));
+    return r;
+}
+
+
+
+void MotorController::controlMotorSpeed(int pwmPin, int targetMotorSpeed) {
+    
+    int currentTime = asm_ccount();
+    this->motorSpeedDeltaTime = currentTime - this->motorSpeedLastTime;
+
+    if (MotorController::motorSpeedDeltaTime >= (MotorController::motorSpeedAccelerationTime * 80000)) {
+
+        this->motorSpeed += MotorController::motorSpeedAccelerationValue;
+
+        if (this->motorSpeed > targetMotorSpeed) {
+            this->motorSpeed = targetMotorSpeed;
+        }
+
+        Serial.println(this->motorSpeed);
+
+        analogWrite(pwmPin, MotorController::motorSpeed);
+
+        this->motorSpeedLastTime = asm_ccount();
+    }
+}
+
+
 
 void MotorController::steer(MotorController::direction direction) {
 
@@ -69,6 +113,8 @@ void MotorController::steer(MotorController::direction direction) {
     return;
 }
 
+
+
 void MotorController::drive(MotorController::direction direction) {                            // Drive Motor forward and backward, OBS! NOT TESTED
     
     if (direction == MotorController::direction::neutral) {
@@ -76,14 +122,16 @@ void MotorController::drive(MotorController::direction direction) {             
         digitalWrite(this->motorPinB, LOW);
     }
     else if (direction == MotorController::direction::forward) {
+        MotorController::controlMotorSpeed(MotorController::motorPinA, MotorController::maxMotorSpeed);
         digitalWrite(this->motorPinB, LOW);
-        analogWrite(this->motorPinA, maxMotorSpeed);
     }
     else if (direction == MotorController::direction::reverse) {
         digitalWrite(this->motorPinA, LOW);
-        analogWrite(this->motorPinB, maxMotorSpeed);
+        MotorController::controlMotorSpeed(MotorController::motorPinB, MotorController::maxMotorSpeed);
     }
 }
+
+
 
 void MotorController::drive(MotorController::direction direction, float speedPercent) {         // Drive Motor forward and backward, OBS! NOT TESTED
     
@@ -95,21 +143,10 @@ void MotorController::drive(MotorController::direction direction, float speedPer
     }
     else if (direction == MotorController::direction::forward) {
         digitalWrite(this->motorPinB, LOW);
-
-        /*                                                                              // TODO - Make a new private function to ramp the speed up/down?
-        while (this->motorSpeed < this->targetMotorSpeed) {
-            this->motorSpeed += 1;
-            analogWrite(this->motorPinA, this->motorSpeed);
-            delay(5);
-        }
-        */
-
-        analogWrite(this->motorPinA, maxMotorSpeed);
+        MotorController::controlMotorSpeed(MotorController::motorPinA, this->targetMotorSpeed);
     }
     else if (direction == MotorController::direction::reverse) {
         digitalWrite(this->motorPinA, LOW);
-        analogWrite(this->motorPinB, maxMotorSpeed);
+        MotorController::controlMotorSpeed(MotorController::motorPinB, this->targetMotorSpeed);
     }
-
-    this->lastMotorSpeed = this->motorSpeed;
 }

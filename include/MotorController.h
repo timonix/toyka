@@ -38,7 +38,13 @@ private:
     int steeringReturnTime = 20;     // Time of signal to motors when turning forward
 
     direction lastDirection;
-    int lastMotorSpeed;              // Used in ramping of speed and such??
+
+    void controlMotorSpeed(int pwmPin, int targetMotorSpeed);       // Control the driver motors speed by adding speed with specific intervals
+
+    int motorSpeedDeltaTime;
+    int motorSpeedLastTime;
+    int motorSpeedAccelerationTime = 100;         // The time between acceleration of the motor, in milliseconds (?)
+    int motorSpeedAccelerationValue = 10;        // The value added to the motor speed
 
 };
 

@@ -39,6 +39,7 @@ Adafruit_MPU6050 mpu;
 ESP8266WebServer server(80);
 
 MotorController steeringMotor(300, 14, 15);
+MotorController driveMotor(100, 12, 13);
 
 void webTest() {
   server.send(200, "text/html", "<h1>Du är online, kompis</h1>");
@@ -52,6 +53,7 @@ void setup() {
   Serial.println("Start of program!");
 
   steeringMotor.init();
+  driveMotor.init();
 
   // --- Initializing the MPU ---
   
@@ -129,6 +131,14 @@ void loop() {
       steeringMotor.steer(MotorController::direction::right);
     else if (serialSignal == 'f')
       steeringMotor.steer(MotorController::direction::forward);
+  
+    if (serialSignal == '1')
+      driveMotor.drive(MotorController::direction::forward);
+    else if (serialSignal == '2')
+      driveMotor.drive(MotorController::direction::neutral);
+    else if (serialSignal == '3') 
+      driveMotor.drive(MotorController::direction::reverse);
+  
   }
 
   
