@@ -11,13 +11,12 @@ Av: Timjan & Noc
 #include <Arduino.h>
 #include <Adafruit_MPU6050.h>
 #include <Wire.h>
-#include <ESP8266WiFi.h>
-#include <WiFiClient.h>
-#include <ESP8266WebServer.h>
 
 #include "test.h"
 #include "webCode.h"
 #include "MotorController.h"
+#include "WebServer.h"
+#include "auth.h"
 
 
 // --- Wifi and webserver stuff ---
@@ -27,23 +26,15 @@ Av: Timjan & Noc
 #define APPSK  "password"     // OBS, kan ej vara samma som SSID (iallafall inte som en #defined)
 #endif
 
-const char *ssid = APSSID;
-const char *password = APPSK;
-
-IPAddress apIP(192, 168, 1, 1);
-
 
 // --- Defining of objects and variables ---
 
 Adafruit_MPU6050 mpu;
-ESP8266WebServer server(80);
 
 MotorController steeringMotor(300, 14, 15);
 MotorController driveMotor(100, 12, 13);
 
-void webTest() {
-  server.send(200, "text/html", "<h1>Du är online, kompis</h1>");
-}
+WebServer web(ssid, password);
 
 
 void setup() {
@@ -52,6 +43,7 @@ void setup() {
   delay(1000);
   Serial.println("Start of program!");
 
+  web.initWebSocket();
   steeringMotor.init();
   driveMotor.init();
 
@@ -67,31 +59,17 @@ void setup() {
   mpu.setGyroRange(MPU6050_RANGE_500_DEG);
   mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
   
-
-  // --- Webserver stuff ---
-
-  WiFi.mode(WIFI_AP_STA);
-  WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0)); 
-  WiFi.softAP(ssid, password);
-
-  IPAddress myIP = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
-  Serial.println(apIP);
-
-  server.on("/test", webTest);
-  server.begin();
-  Serial.print("Server started");
-
-
   
   delay(100);
 }
 
 void loop() {
   
-  server.handleClient();
-
-
+  web.updateWebSocket();
+  Serial.print("Angle:");
+  Serial.println(web.getAngle());
+  Serial.print("Speed:");
+  Serial.println(web.getSpeed());
   
   /* Get new sensor events with the readings */
   sensors_event_t a, g, temp;
