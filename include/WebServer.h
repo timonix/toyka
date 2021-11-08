@@ -10,6 +10,8 @@ public:
     WebServer(const char* SSID, const char* pass);
     void initWebSocket();
     void updateWebSocket();
+    int getSpeed();
+    int getAngle();
 
 
 private:

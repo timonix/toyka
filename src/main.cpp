@@ -64,8 +64,10 @@ void setup() {
 void loop() {
   
   web.updateWebSocket();
-  
-
+  Serial.print("Angle:");
+  Serial.println(web.getAngle());
+  Serial.print("Speed:");
+  Serial.println(web.getSpeed());
   
   /* Get new sensor events with the readings */
   sensors_event_t a, g, temp;
