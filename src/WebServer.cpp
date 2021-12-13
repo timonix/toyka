@@ -277,6 +277,7 @@ String processor(const String& var){
 }
 
 void WebServer::initWebSocket() {
+    
     WiFi.begin(ssid);
     while (WiFi.status() != WL_CONNECTED) {
         delay(1000);

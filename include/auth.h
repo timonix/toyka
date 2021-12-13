@@ -2,5 +2,5 @@
 #ifndef AUTH
 #define AUTH
 const char* ssid = "ESP";
-const char* password = "pass";
+const char* password = "password123";
 #endif
