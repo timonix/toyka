@@ -280,25 +280,12 @@ String processor(const String& var){
 
 void WebServer::initWebSocket() {
 
-    WiFi.softAP(ssid,password);
-
-    WiFi.mode(WIFI_AP_STA);
-    WiFi.softAP(ssidAP, passwordAP);
-    WiFi.begin(ssid);
-    //WiFi.mode(WIFI_AP);
-    //WiFi.begin(ssid2,password2);
-    Serial.print("Connecting to WiFi.");
-    for(int i = 0; i<10;i++){
-        delay(1000);
-        Serial.print(".");
-        if(WiFi.status()==WL_CONNECTED) {
-            Serial.println("");
-            Serial.println("Connected");
-            break;
-        }
-    }
-    if(WiFi.status() != WL_CONNECTED){
-        Serial.println("Failed to connect to wifi, running local access point");
+    Serial.print("Setting soft-AP ... ");
+    boolean connectionSuccess = WiFi.softAP(ssidAP, passwordAP);
+    if(connectionSuccess){
+        Serial.println("Ready");
+    }else{
+        Serial.println("Failed!");
     }
 
     IPAddress IP = WiFi.softAPIP();

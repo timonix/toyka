@@ -99,7 +99,7 @@ void loop() {
 
   // --- Testing code for motors -----------
 
-  if (Serial.available()) {
+  /*if (Serial.available()) {
     char serialSignal = Serial.read();
     Serial.println(serialSignal);
 
@@ -109,15 +109,7 @@ void loop() {
       steeringMotor.steer(MotorController::direction::right);
     else if (serialSignal == 'f')
       steeringMotor.steer(MotorController::direction::forward);
-  
-    if (serialSignal == '1')
-      driveMotor.drive(MotorController::direction::forward);
-    else if (serialSignal == '2')
-      driveMotor.drive(MotorController::direction::neutral);
-    else if (serialSignal == '3') 
-      driveMotor.drive(MotorController::direction::reverse);
-  
-  }
+  }*/
 
   
 
