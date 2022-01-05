@@ -52,6 +52,12 @@ font-size: xx-large;">
         function send_angle(angle){
             connection.send("a"+angle);
         }
+        function send_x(x){
+            connection.send("x"+x);
+        }
+        function send_y(y){
+            connection.send("y"+y);
+        }
 
 
     </script>
@@ -153,6 +159,8 @@ font-size: xx-large;">
 
             send_speed(0);
             send_angle(0);
+            send_x(0);
+            send_y(0);
 
         }
 
@@ -200,6 +208,8 @@ font-size: xx-large;">
                 //send( x_relative,y_relative,speed,angle_in_degrees);
                 send_speed(speed);
                 send_angle(angle_in_degrees);
+                send_x(x_relative);
+                send_y(y_relative);
             }
         } 
     </script>
@@ -212,6 +222,8 @@ AsyncWebSocket ws("/ws");
 
 int speed;
 int angle;
+int x;
+int y;
 
 WebServer::WebServer(const char* ssid, const char* pass,const char* ssidAP, const char* passAP)
 {
@@ -228,6 +240,14 @@ int WebServer::getAngle(){
 
 int WebServer::getSpeed(){
     return speed;
+}
+
+int WebServer::getX(){
+    return x;
+}
+
+int WebServer::getY(){
+    return y;
 }
 
 void WebServer::updateWebSocket() {
@@ -255,6 +275,12 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
         }
         if (data[0] == 'a') {
             ss >> angle;
+        }
+        if (data[0] == 'x') {
+            ss >> x;
+        }
+        if (data[0] == 'y') {
+            ss >> y;
         }
 
       notifyClients();

@@ -70,6 +70,10 @@ void loop() {
   Serial.println(web.getAngle());
   Serial.print("Speed:");
   Serial.println(web.getSpeed());
+  Serial.print("x:");
+  Serial.println(web.getX());
+  Serial.print("y:");
+  Serial.println(web.getY());
   
   /* Get new sensor events with the readings */
   sensors_event_t a, g, temp;

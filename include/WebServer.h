@@ -12,6 +12,8 @@ public:
     void updateWebSocket();
     int getSpeed();
     int getAngle();
+    int getX();
+    int getY();
 
 
 private:
