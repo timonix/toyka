@@ -7,7 +7,7 @@ class WebServer
     
 public:
     
-    WebServer(const char* SSID, const char* pass);
+    WebServer(const char* ssid, const char* pass,const char* ssidAP, const char* passAP);
     void initWebSocket();
     void updateWebSocket();
     int getSpeed();
@@ -22,6 +22,8 @@ private:
 
     const char* password;
     const char* ssid;
+    const char* passwordAP;
+    const char* ssidAP;
 
 };
 

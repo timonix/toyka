@@ -213,10 +213,12 @@ AsyncWebSocket ws("/ws");
 int speed;
 int angle;
 
-WebServer::WebServer(const char* ssid, const char* pass)
+WebServer::WebServer(const char* ssid, const char* pass,const char* ssidAP, const char* passAP)
 {
     this->ssid = ssid;
     this->password = pass;
+    this->ssidAP = ssidAP;
+    this->passwordAP = passAP;
 
 }
 
@@ -277,12 +279,31 @@ String processor(const String& var){
 }
 
 void WebServer::initWebSocket() {
+
+    WiFi.softAP(ssid,password);
+
+    WiFi.mode(WIFI_AP_STA);
+    WiFi.softAP(ssidAP, passwordAP);
     WiFi.begin(ssid);
-    while (WiFi.status() != WL_CONNECTED) {
+    //WiFi.mode(WIFI_AP);
+    //WiFi.begin(ssid2,password2);
+    Serial.print("Connecting to WiFi.");
+    for(int i = 0; i<10;i++){
         delay(1000);
-        Serial.println("Connecting to WiFi..");
+        Serial.print(".");
+        if(WiFi.status()==WL_CONNECTED) {
+            Serial.println("");
+            Serial.println("Connected");
+            break;
+        }
+    }
+    if(WiFi.status() != WL_CONNECTED){
+        Serial.println("Failed to connect to wifi, running local access point");
     }
 
+    IPAddress IP = WiFi.softAPIP();
+    Serial.print("AP IP address: ");
+    Serial.println(IP);
     // Print ESP Local IP Address
     Serial.println(WiFi.localIP());
 

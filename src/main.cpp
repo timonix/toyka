@@ -34,7 +34,7 @@ Adafruit_MPU6050 mpu;
 MotorController steeringMotor(300, 14, 15);
 MotorController driveMotor(100, 12, 13);
 
-WebServer web(ssid, password);
+WebServer web(ssid, password, ssidAP, passwordAP);
 
 
 void setup() {
@@ -94,7 +94,7 @@ void loop() {
   Serial.print(g.gyro.z);
   Serial.println(" rad/s");
 */
-  delay(50);
+  delay(1000);
   
 
   // --- Testing code for motors -----------
