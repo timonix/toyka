@@ -10,7 +10,7 @@ static char html_page[] PROGMEM = R"rawliteral(
 <html>
 <head>
     <title>
-        Mousebot
+        toyka
     </title>
     <meta name="viewport" content="user-scalable=no">
 </head>
@@ -18,7 +18,7 @@ static char html_page[] PROGMEM = R"rawliteral(
 color:rgb(128, 128, 128);
 font-size: xx-large;">
     <h1 style="text-align:center">
-        MOUSEBOT </h1>
+        toyka </h1>
     <p style="text-align: center;">
         X: <span id="x_coordinate"> </span>
         Y: <span id="y_coordinate"> </span>
@@ -51,6 +51,12 @@ font-size: xx-large;">
         }
         function send_angle(angle){
             connection.send("a"+angle);
+        }
+        function send_x(x){
+            connection.send("x"+x);
+        }
+        function send_y(y){
+            connection.send("y"+y);
         }
 
 
@@ -97,7 +103,8 @@ font-size: xx-large;">
             y_orig = height / 3;
 
             ctx.beginPath();
-            ctx.arc(x_orig, y_orig, radius + 20, 0, Math.PI * 2, true);
+            //ctx.arc(x_orig, y_orig, radius + 20, 0, Math.PI * 2, true);
+            ctx.fillRect(x_orig - radius, y_orig - radius, radius*2, radius*2);
             ctx.fillStyle = '#ECE5E5';
             ctx.fill();
         }
@@ -109,7 +116,7 @@ font-size: xx-large;">
             ctx.fill();
             ctx.strokeStyle = '#F6ABAB';
             ctx.lineWidth = 8;
-            ctx.stroke();
+            ctx.stroke();   
         }
 
         let coord = { x: 0, y: 0 };
@@ -123,8 +130,8 @@ font-size: xx-large;">
         }
 
         function is_it_in_the_circle() {
-            var current_radius = Math.sqrt(Math.pow(coord.x - x_orig, 2) + Math.pow(coord.y - y_orig, 2));
-            if (radius >= current_radius) return true
+
+            if (Math.abs(coord.x - x_orig) < radius && Math.abs(coord.y - y_orig) < radius) return true
             else return false
         }
 
@@ -153,6 +160,8 @@ font-size: xx-large;">
 
             send_speed(0);
             send_angle(0);
+            send_x(0);
+            send_y(0);
 
         }
 
@@ -200,6 +209,8 @@ font-size: xx-large;">
                 //send( x_relative,y_relative,speed,angle_in_degrees);
                 send_speed(speed);
                 send_angle(angle_in_degrees);
+                send_x(x_relative);
+                send_y(y_relative);
             }
         } 
     </script>
@@ -212,6 +223,8 @@ AsyncWebSocket ws("/ws");
 
 int speed;
 int angle;
+int x;
+int y;
 
 WebServer::WebServer(const char* ssid, const char* pass,const char* ssidAP, const char* passAP)
 {
@@ -228,6 +241,14 @@ int WebServer::getAngle(){
 
 int WebServer::getSpeed(){
     return speed;
+}
+
+int WebServer::getX(){
+    return x;
+}
+
+int WebServer::getY(){
+    return y;
 }
 
 void WebServer::updateWebSocket() {
@@ -256,6 +277,12 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
         }
         if (data[0] == 'a') {
             ss >> angle;
+        }
+        if (data[0] == 'x') {
+            ss >> x;
+        }
+        if (data[0] == 'y') {
+            ss >> y;
         }
 
       notifyClients();
