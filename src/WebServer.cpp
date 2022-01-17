@@ -235,12 +235,13 @@ void WebServer::updateWebSocket() {
 }
 
 void notifyClients() {
-    //String text = "{s:"+std::to_string(speed)+",a:"+std::to_string(angle)+"}";
-    String text = "{";
-    text = text + "s:"+std::to_string(speed);
-    text = text + ",a:"+std::to_string(angle);
-    text = text + "}";
-    ws.textAll(text);
+    std::string text = "{";
+    text.append("s:");
+    text.append(std::to_string(speed));
+    text.append(",a:");
+    text.append(std::to_string(angle));
+    char* c = const_cast<char*>(text.c_str());
+    ws.textAll(c);
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) { 
