@@ -74,6 +74,7 @@ void loop() {
   /* Get new sensor events with the readings */
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
+  
 
   /* Print out the values */
 
@@ -95,7 +96,10 @@ void loop() {
   Serial.println(" rad/s");
 */
   delay(1000);
-  
+  analogWrite(13, 127);
+  digitalWrite(12,0);
+  delay(1000);
+  digitalWrite(12,1);
 
   // --- Testing code for motors -----------
 

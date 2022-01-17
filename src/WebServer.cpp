@@ -1,4 +1,4 @@
-
+#include <string>
 #include <sstream>
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
@@ -235,7 +235,12 @@ void WebServer::updateWebSocket() {
 }
 
 void notifyClients() {
-    ws.textAll("NOTIFY STRING");
+    //String text = "{s:"+std::to_string(speed)+",a:"+std::to_string(angle)+"}";
+    String text = "{";
+    text = text + "s:"+std::to_string(speed);
+    text = text + ",a:"+std::to_string(angle);
+    text = text + "}";
+    ws.textAll(text);
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) { 
