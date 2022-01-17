@@ -49,6 +49,9 @@ void MotorController::controlMotorSpeed(int pwmPin, int targetMotorSpeed) {
     int currentTime = asm_ccount();
     this->motorSpeedDeltaTime = currentTime - this->motorSpeedLastTime;
 
+    analogWrite(pwmPin, targetMotorSpeed);
+
+/*
     if (MotorController::motorSpeedDeltaTime >= (MotorController::motorSpeedAccelerationTime * 80000)) {
 
         this->motorSpeed += MotorController::motorSpeedAccelerationValue;
@@ -63,6 +66,7 @@ void MotorController::controlMotorSpeed(int pwmPin, int targetMotorSpeed) {
 
         this->motorSpeedLastTime = asm_ccount();
     }
+    */
 }
 
 
@@ -133,9 +137,11 @@ void MotorController::drive(MotorController::direction direction) {             
 
 
 
-void MotorController::drive(MotorController::direction direction, float speedPercent) {         // Drive Motor forward and backward, OBS! NOT TESTED
-    
-    this->targetMotorSpeed = int(speedPercent * float(this->maxMotorSpeed));
+void MotorController::drive(MotorController::direction direction, float speedPercent) {         // Drive Motor forward and backward, OBS! NOT TESTED     
+
+    // Speedpercent should be between 0 and 100
+
+    this->targetMotorSpeed = int(speedPercent/100 * float(this->maxMotorSpeed));
 
     if (direction == MotorController::direction::neutral) {
         digitalWrite(this->motorPinA, LOW);
