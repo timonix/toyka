@@ -38,6 +38,11 @@ font-size: xx-large;">
         };
         connection.onmessage = function (e) {
             console.log('Server: ', e.data);
+            const obj = JSON.parse(e.data);
+            document.getElementById("x_coordinate").innerText = obj.x;
+            document.getElementById("y_coordinate").innerText = obj.y;
+            document.getElementById("speed").innerText = obj.s;
+            document.getElementById("angle").innerText = obj.a;
         };
 
         function send(x,y,speed,angle){
@@ -261,6 +266,11 @@ void notifyClients() {
     text.append(std::to_string(speed));
     text.append(",a:");
     text.append(std::to_string(angle));
+    text.append(",x:");
+    text.append(std::to_string(x));
+    text.append(",y:");
+    text.append(std::to_string(y));
+    text.append("}");
     char* c = const_cast<char*>(text.c_str());
     ws.textAll(c);
 }
