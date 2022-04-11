@@ -80,6 +80,22 @@ void UdpTransceiver::receiveData(uint8_t* packet){
     packet[0] = NO_DATA_HEADER;
 }
 
+static int constructReplyFromSensorData(uint8_t* message, uint8_t sensorType, float* data, long time){
+    message[0] = sensorType;
+    uint32_t index = 1;
+    for (uint32_t i = 0; i<sizeof(long);i++){
+        message[index] = data[i];
+        index++;
+    }
+
+    for (uint32_t i = 0; i<sizeof(float)*3+1;i++){
+        message[index] = data[i];
+        index++;
+    }
+    
+    return index;
+}
+
 
 void UdpTransceiver::publishSensor(uint8_t sensorType, float* data, long timeStamp){
     uint8_t msg[10];
@@ -92,23 +108,6 @@ void UdpTransceiver::publishSensor(uint8_t sensorType, float* data, long timeSta
         UDP.write(msg,message_len);
         UDP.endPacket();
     }
-}
-
-static int constructReplyFromSensorData(uint8_t* message, uint8_t sensorType, float* data, long time){
-    message[0] = sensorType;
-    byte* d = (byte*) data;
-    int index = 1;
-    for (int i = 0; i<sizeof(long);i++){
-        message[index] = data[i];
-        index++;
-    }
-
-    for (int i = 0; i<sizeof(float)*3+1;i++){
-        message[index] = data[i];
-        index++;
-    }
-    
-    return index;
 }
 
 void UdpTransceiver::reconnect(){
