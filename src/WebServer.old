@@ -116,9 +116,9 @@ font-size: xx-large;">
 
             ctx.beginPath();
             //ctx.arc(x_orig, y_orig, radius + 20, 0, Math.PI * 2, true);
-            ctx.fillRect(x_orig - radius, y_orig - radius, radius*2, radius*2);
             ctx.fillStyle = '#ECE5E5';
-            ctx.fill();
+            ctx.fillRect(x_orig - radius, y_orig - radius, radius*2, radius*2);
+            //ctx.fill();
         }
 
         function joystick(width, height) {
@@ -199,8 +199,29 @@ font-size: xx-large;">
                     y = coord.y;
                 }
                 else {
-                    x = radius * Math.cos(angle) + x_orig;
-                    y = radius * Math.sin(angle) + y_orig;
+                    //x = radius * Math.cos(angle) + x_orig;
+                    //y = radius * Math.sin(angle) + y_orig;
+
+                    if ((coord.x - x_orig) > radius) {
+                        x = radius + x_orig;
+                    }
+                    else if ((coord.x - x_orig) < -radius) {
+                        x = -radius + x_orig;
+                    }
+                    else {
+                        x = coord.x;
+                    }
+
+                    if ((coord.y - y_orig) > radius) {
+                        y = radius + y_orig;
+                    }
+                    else if ((coord.y - y_orig) < -radius) {
+                        y = -radius + y_orig;
+                    }
+                    else {
+                        y = coord.y;
+                    }
+
                     joystick(x, y);
                 }
 

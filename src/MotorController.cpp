@@ -42,8 +42,6 @@ static inline int asm_ccount(void) {
     return r;
 }
 
-
-
 void MotorController::controlMotorSpeed(int pwmPin, int targetMotorSpeed) {
     
     int currentTime = asm_ccount();
@@ -69,6 +67,55 @@ void MotorController::controlMotorSpeed(int pwmPin, int targetMotorSpeed) {
     */
 }
 
+
+void MotorController::autoSteer(float controlSignal, direction direction) {
+
+    float motorSignal;
+
+    if (direction == MotorController::forward) {
+
+        if (controlSignal < 0) {
+            motorSignal = map(controlSignal, 0, -100, minSteerSpeed, maxSteerSpeed);
+
+            digitalWrite(motorPinA, LOW);
+            analogWrite(motorPinB, motorSignal);
+        }
+        else if (controlSignal > 0) {
+            motorSignal = map(controlSignal, 0, 100, minSteerSpeed, maxSteerSpeed);
+
+            digitalWrite(motorPinB, LOW);
+            analogWrite(motorPinA, motorSignal);
+        }
+        else if (controlSignal == 0) {
+            digitalWrite(motorPinA, LOW);
+            digitalWrite(motorPinB, LOW);
+        }
+    }
+    else if (direction == MotorController::reverse) {
+        
+        if (controlSignal < 0) {
+            motorSignal = map(controlSignal, 0, -100, minSteerSpeed, maxSteerSpeed);
+
+            digitalWrite(motorPinB, LOW);
+            analogWrite(motorPinA, motorSignal);
+        }
+        else if (controlSignal > 0) {
+            motorSignal = map(controlSignal, 0, 100, minSteerSpeed, maxSteerSpeed);
+
+            digitalWrite(motorPinA, LOW);
+            analogWrite(motorPinB, motorSignal);
+        }
+        else if (controlSignal == 0) {
+            digitalWrite(motorPinA, LOW);
+            digitalWrite(motorPinB, LOW);
+        }
+    }
+    else if (direction == MotorController::neutral) {
+        digitalWrite(motorPinA, LOW);
+        digitalWrite(motorPinB, LOW);
+    }
+    return;
+}
 
 
 void MotorController::steer(MotorController::direction direction) {

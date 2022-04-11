@@ -20,6 +20,7 @@ public:
     void init();
     void steer(direction direction);
     void steer(direction direction, float speedPercent);       // speedPercent is a float value between 0-1
+    void autoSteer(float controlSignal, direction direction);
 
     void drive(direction direction);
     void drive(direction direction, float speedPercent);       // speedPercent is a float value between 0-1
@@ -45,6 +46,9 @@ private:
     int motorSpeedLastTime;
     int motorSpeedAccelerationTime = 100;         // The time between acceleration of the motor, in milliseconds (?)
     int motorSpeedAccelerationValue = 10;        // The value added to the motor speed
+
+    float minSteerSpeed = 50;
+    float maxSteerSpeed = 150;
 
 };
 
