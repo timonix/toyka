@@ -14,8 +14,9 @@ Av: Timjan & Noc
 
 #include "test.h"
 #include "webCode.h"
+#include "UdpTransceiver.h"
 #include "MotorController.h"
-#include "WebServer.h"
+//#include "WebServer.h"
 #include "auth.h"
 
 
@@ -34,9 +35,11 @@ Adafruit_MPU6050 mpu;
 MotorController steeringMotor(200, 13, 12);
 MotorController driveMotor(255, 14, 15);
 
-WebServer web(ssid, password, ssidAP, passwordAP);
+//WebServer web(ssid, password, ssidAP, passwordAP);
+UdpTransceiver tcp(ssid, password, ssidAP, passwordAP);
 
 const int led = 3;
+const int analogInPin = A0;
 
 
 void setup() {
@@ -44,8 +47,8 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
   Serial.println("Start of program!");
+  tcp.initServer();
 
-  web.initWebSocket();
   steeringMotor.init();
   driveMotor.init();
   pinMode(led, OUTPUT);
@@ -67,101 +70,14 @@ void setup() {
 }
 
 void loop() {
-  
-  web.updateWebSocket();
- /*
-  Serial.print("Angle:");
-  Serial.print(web.getAngle());
-  Serial.print("   Speed:");
-  Serial.print(web.getSpeed());
-  Serial.print("   x:");
-  Serial.print(web.getX());
-  Serial.print("   y:");
-  Serial.println(web.getY());
-*/
-  int angle = web.getAngle();
-  int speed = web.getSpeed();
-  int x = web.getX();
-  int y = web.getY();
+  delay(10);
+  tcp.update();
+  uint8_t packet[255];
+  tcp.receiveData(packet);
 
-  
-  /* Get new sensor events with the readings */
+
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
-  
-
-  /* Print out the values */
-
-  /*
-  Serial.print("Acceleration X: ");
-  Serial.print(a.acceleration.x);
-  Serial.print(", Y: ");
-  Serial.print(a.acceleration.y);
-  Serial.print(", Z: ");
-  Serial.print(a.acceleration.z);
-  Serial.print(" m/s^2    ");
-
-  Serial.print("Rotation X: ");
-  Serial.print(g.gyro.x);
-  Serial.print(", Y: ");
-  Serial.print(g.gyro.y);
-  Serial.print(", Z: ");
-  Serial.print(g.gyro.z);
-  Serial.println(" rad/s");
-*/
-
-  // --- Testing code for motors ----------- 
-
-
-  int motorSpeed = map(abs(y), 0, 200, 0, 100);
-
-  if (y < 0) {
-    driveMotor.drive(MotorController::forward, motorSpeed);
-  }
-  else if (y > 0) {
-    driveMotor.drive(MotorController::reverse, motorSpeed);
-  }
-  else {
-    driveMotor.drive(MotorController::neutral, 0);
-  }
-
-  // LED stuff
-  if (y > 10)
-    digitalWrite(led, HIGH);
-  else
-    digitalWrite(led, LOW);
-
-  // Steering stuff
-  if (x < -50) 
-    steeringMotor.steer(MotorController::left);
-  else if (x > 50) 
-    steeringMotor.steer(MotorController::right);
-  else 
-    steeringMotor.steer(MotorController::forward);
-
-/*
-  analogWrite(12, 127);
-  digitalWrite(13, LOW);
-  //steeringMotor.drive(MotorController::forward, 100);
-  delay(2000);
-  digitalWrite(13, HIGH);
-  //steeringMotor.drive(MotorController::reverse, 100);
-  delay(2000);
-*/
-
-
-  /*if (Serial.available()) {
-    char serialSignal = Serial.read();
-    Serial.println(serialSignal);
-
-    if (serialSignal == 'l')
-      steeringMotor.steer(MotorController::direction::left);
-    else if (serialSignal == 'r')
-      steeringMotor.steer(MotorController::direction::right);
-    else if (serialSignal == 'f')
-      steeringMotor.steer(MotorController::direction::forward);
-  }*/
-
-  
+  tcp.publishSensor(GYROSCOPE_HEADER,g.data,micros());
 
 }

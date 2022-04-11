@@ -24,6 +24,7 @@ font-size: xx-large;">
         Y: <span id="y_coordinate"> </span>
         Speed: <span id="speed"> </span> %
         Angle: <span id="angle"> </span>
+        Battery: <span id="battery"> </span>
     </p>
     <canvas id="canvas" name="game"></canvas>
     <script>
@@ -39,10 +40,16 @@ font-size: xx-large;">
         connection.onmessage = function (e) {
             console.log('Server: ', e.data);
             const obj = JSON.parse(e.data);
-            document.getElementById("x_coordinate").innerText = obj.x;
-            document.getElementById("y_coordinate").innerText = obj.y;
-            document.getElementById("speed").innerText = obj.s;
-            document.getElementById("angle").innerText = obj.a;
+            if(obj.x){
+                document.getElementById("x_coordinate").innerText = obj.x;
+                document.getElementById("y_coordinate").innerText = obj.y;
+                document.getElementById("speed").innerText = obj.s;
+                document.getElementById("angle").innerText = obj.a;
+            }
+            if(obj.b){
+                document.getElementById("battery").innerText = obj.b;
+            }
+
         };
 
         function send(x,y,speed,angle){
@@ -230,6 +237,7 @@ int speed;
 int angle;
 int x;
 int y;
+int battery_level;
 
 WebServer::WebServer(const char* ssid, const char* pass,const char* ssidAP, const char* passAP)
 {
@@ -256,10 +264,6 @@ int WebServer::getY(){
     return y;
 }
 
-void WebServer::updateWebSocket() {
-    ws.cleanupClients();
-}
-
 void notifyClients() {
     std::string text = "{";
     text.append("s:");
@@ -270,9 +274,16 @@ void notifyClients() {
     text.append(std::to_string(x));
     text.append(",y:");
     text.append(std::to_string(y));
+    text.append(",b:");
+    text.append(std::to_string(battery_level));
     text.append("}");
     char* c = const_cast<char*>(text.c_str());
     ws.textAll(c);
+
+}
+
+void WebServer::updateWebSocket() {
+    ws.cleanupClients();
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) { 
