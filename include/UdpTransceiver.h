@@ -22,7 +22,7 @@ public:
     void initServer();
     void update();
 
-    void receiveData(uint8_t* packet);
+    void receiveData(int8_t* packet);
 
     void publishSensor(uint8_t sensorType, float* data, long timeStamp);
     //static int constructReplyFromSensorData(uint8_t* message, uint8_t sensorType, float* data, long time);

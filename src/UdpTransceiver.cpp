@@ -6,7 +6,6 @@
 #define PORT 42100
 
 WiFiUDP UDP;
-char reply[] = "Packet received!";
 
 unsigned long previousMillis;
 boolean reconnected = false;
@@ -60,22 +59,13 @@ void UdpTransceiver::addPeer(IPAddress ip){
     connectedPeers[hashIP(ip,NUM_PEERS-1)] = ip;
 }
 
-void UdpTransceiver::receiveData(uint8_t* packet){
-    //char packet[255];
-    
+void UdpTransceiver::receiveData(int8_t* packet){
 
     int packetSize = UDP.parsePacket();
     if (packetSize) {
-        Serial.print("Received packet! Size: ");
-        Serial.println(packetSize); 
-        
-        int len = UDP.read(packet, 255);
-        if (len > 0)
-        {
-            packet[len] = '\0';
-        }
-
+        UDP.read((byte*)packet, 255);
         addPeer(UDP.remoteIP());
+        return;
     }
     packet[0] = NO_DATA_HEADER;
 }
@@ -100,9 +90,6 @@ static int constructReplyFromSensorData(uint8_t* message, uint8_t sensorType, fl
 void UdpTransceiver::publishSensor(uint8_t sensorType, float* data, long timeStamp){
     uint8_t msg[10];
     int message_len = constructReplyFromSensorData(msg, sensorType, data, timeStamp);
-    //UDP.beginPacket(INADDR_NONE, PORT);
-    //UDP.write(msg,message_len);
-    //UDP.endPacket();
     for(auto & peer : connectedPeers){
         UDP.beginPacket(peer, PORT);
         UDP.write(msg,message_len);

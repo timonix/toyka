@@ -83,15 +83,23 @@ void loop() {
 
   // --- Fetching and calculating signals ---------------------------------
   
-  uint8_t packet[255];
+  int8_t packet[255];
   tcp.receiveData(packet);
 
   if (packet[0] == TARGET_SPEED_HEADER) {
-    driveSpeed = packet[1];
+    if (packet[1] != driveSpeed){
+      driveSpeed = packet[1];
+      Serial.print("new speed:");
+      Serial.println(driveSpeed);
+    }
   }
 
   if (packet[0] == STICK_DIRECTION_HEADER) {
-    targetDirection = packet[1];
+    if (packet[1] != targetDirection){
+      targetDirection = packet[1];
+      Serial.print("new direction:");
+      Serial.println(targetDirection);
+    }
   }
   
   steeringController.readMPUValues();
@@ -125,5 +133,5 @@ void loop() {
     digitalWrite(led, LOW);
 
 
-  delay(20);
+  delay(0);
 }
